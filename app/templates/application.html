@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="panel">
+  <h2>{{ app.title }} @ {{ app.company }}</h2>
+  <div class="row" style="margin-bottom:12px">
+    <span class="pill queued">{{ app.portal }}</span>
+    <span class="pill {{ app.status }}">{{ app.status }}</span>
+    <span class="small muted">Update: {{ app.updated_at }}</span>
+    <div class="spacer"></div>
+    <a class="btn ghost" href="{{ app.url }}" target="_blank">Buka lowongan asli ↗</a>
+    <form method="post" action="/application/{{ app.id }}/regenerate">
+      <button class="ghost" type="submit">↻ Buat ulang surat</button>
+    </form>
+  </div>
+
+  {% if app.error %}
+  <div class="errbox">❌ {{ app.error }}</div>
+  {% endif %}
+
+  {% if app.submit_log %}
+  <div class="hintbox">ℹ️ {{ app.submit_log }}</div>
+  {% endif %}
+
+  {% if app.cover_letter %}
+  <h2>Surat lamaran (dibuat AI)</h2>
+  <pre>{{ app.cover_letter }}</pre>
+  {% else %}
+  <p class="muted">Surat belum dibuat. Status antrian: <b>{{ app.status }}</b>. Worker akan memprosesnya.</p>
+  {% endif %}
+
+  {% if answers %}
+  <h2 style="margin-top:16px">Jawaban pertanyaan screening</h2>
+  <table>
+    <tr><th>Pertanyaan</th><th>Jawaban (AI)</th></tr>
+    {% for a in answers %}
+    <tr><td>{{ a.question }}</td><td>{{ a.answer }}</td></tr>
+    {% endfor %}
+  </table>
+  {% endif %}
+
+  {% if can_auto %}
+  <div class="hintbox">
+    ✅ Portal ini mendukung auto-submit. Saat browser automation diaktifkan
+    (<code>AUTOLAMAR_BROWSER=true</code>), sistem akan mengirim surat ini otomatis.
+  </div>
+  {% else %}
+  <div class="hintbox">ℹ️ {{ submit_hint }}</div>
+  {% endif %}
+</div>
+
+{% endblock %}

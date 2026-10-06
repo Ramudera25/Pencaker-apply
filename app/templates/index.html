@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="cards">
+  <div class="card"><div class="num" id="c-total">{{ counts.total }}</div><div class="lbl">Total lamaran</div></div>
+  <div class="card"><div class="num" style="color:var(--ok)">{{ counts.submitted }}</div><div class="lbl">Terkirim</div></div>
+  <div class="card"><div class="num" style="color:#93c5fd">{{ counts.generated }}</div><div class="lbl">Surat siap</div></div>
+  <div class="card"><div class="num" style="color:var(--warn)">{{ counts.queued }}</div><div class="lbl">Antrian</div></div>
+  <div class="card"><div class="num" style="color:var(--bad)">{{ counts.failed }}</div><div class="lbl">Gagal</div></div>
+</div>
+
+<div class="panel">
+  <h2>Profile aktif</h2>
+  {% if profiles %}
+  <table>
+    <tr><th>Nama</th><th>Target role</th><th>Kontak</th><th>Skills</th><th></th></tr>
+    {% for p in profiles %}
+    <tr>
+      <td><b>{{ p.name }}</b><br><span class="muted small">{{ p.email }}</span></td>
+      <td>{{ p.target_role }}</td>
+      <td class="small muted">{{ p.phone or '-' }}</td>
+      <td class="small muted">{{ (p.skills or '')[:80] }}</td>
+      <td><a class="btn ghost" href="/profile/{{ p.id }}/edit">Edit</a></td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p class="muted">Belum ada profile. <a href="/profile/new">Buat profile</a> dulu agar AI bisa membuat surat lamaran.</p>
+  {% endif %}
+</div>
+
+<div class="panel">
+  <h2>Aplikasi terbaru</h2>
+  {% if applications %}
+  <table>
+    <tr><th>Status</th><th>Posisi</th><th>Perusahaan</th><th>Portal</th><th>Update</th><th></th></tr>
+    {% for a in applications %}
+    <tr>
+      <td><span class="pill {{ a.status }}">{{ a.status }}</span></td>
+      <td><b>{{ a.title }}</b></td>
+      <td>{{ a.company }}</td>
+      <td class="small muted">{{ a.portal }}</td>
+      <td class="small muted">{{ a.updated_at }}</td>
+      <td><a class="btn ghost" href="/application/{{ a.id }}">Detail</a></td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <p class="muted">Belum ada lamaran. <a href="/search">Cari lowongan</a> lalu klik "Lamar".</p>
+  {% endif %}
+</div>
+
+{% endblock %}

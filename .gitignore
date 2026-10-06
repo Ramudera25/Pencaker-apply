@@ -1,0 +1,23 @@
+# Environment & secrets
+.env
+*.env
+
+# Database (berisi profile & data lamaran pribadi)
+autolamar.db
+*.db
+
+# Logs
+*.log
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environment
+venv/
+.venv/
+
+# Backup
+*.tar.gz
+*.bak

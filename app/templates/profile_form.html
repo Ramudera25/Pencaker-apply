@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="panel">
+  <h2>Profile Kandidat</h2>
+  <form method="post" action="{{ '/profile/' + p.id|string + '/edit' if p else '/profile/new' }}">
+    <label>Nama lengkap *</label>
+    <input name="name" required value="{{ p.name if p else '' }}">
+
+    <label>Email *</label>
+    <input name="email" type="email" required value="{{ p.email if p else '' }}">
+
+    <label>No. HP / WhatsApp</label>
+    <input name="phone" value="{{ p.phone if p else '' }}">
+
+    <label>Posisi yang dituju *</label>
+    <input name="target_role" required value="{{ p.target_role if p else '' }}"
+           placeholder="Contoh: Backend Engineer">
+
+    <label>Headline (1 baris)</label>
+    <input name="headline" value="{{ p.headline if p else '' }}"
+           placeholder="Contoh: Python developer dengan 3 tahun pengalaman">
+
+    <label>Ringkasan diri</label>
+    <textarea name="summary" rows="4">{{ p.summary if p else '' }}</textarea>
+
+    <label>Skills (pisahkan dengan koma)</label>
+    <input name="skills" value="{{ p.skills if p else '' }}"
+           placeholder="Python, FastAPI, PostgreSQL, Docker">
+
+    <label>CV mentah / pengalaman bebas</label>
+    <textarea name="cv_text" rows="6" placeholder="Tempel teks CV di sini. AI akan mengekstraknya jika kamu pakai tombol di bawah.">{{ p.cv_text if p else '' }}</textarea>
+
+    <div class="row">
+      <button type="submit">Simpan Profile</button>
+      <button type="button" class="ghost" id="btn-parse">✨ Ekstrak pakai AI</button>
+      <button type="button" class="ghost" id="btn-fill">Isi otomatis (contoh)</button>
+    </div>
+    <div id="parse-result" class="hintbox" style="display:none"></div>
+  </form>
+</div>
+
+<script>
+const SAMPLE = {
+  name: "Dery Mukarom", email: "dery@example.com", phone: "0812xxxxxxx",
+  target_role: "Backend Engineer",
+  headline: "Backend engineer - Python, FastAPI, infra skalabel",
+  summary: "Membangun dan memelihara API produksi serta otomatisasi infrastruktur.",
+  skills: "Python, FastAPI, PostgreSQL, Docker, Linux, Tailscale, CI/CD"
+};
+
+document.getElementById("btn-fill").onclick = () => {
+  for (const [k, v] of Object.entries(SAMPLE)) {
+    const el = document.querySelector(`[name="${k}"]`);
+    if (el) el.value = v;
+  }
+};
+
+document.getElementById("btn-parse").onclick = async () => {
+  const btn = document.getElementById("btn-parse");
+  const box = document.getElementById("parse-result");
+  const cv = document.querySelector("[name=cv_text]").value.trim();
+  if (!cv) { box.style.display = "block"; box.className = "errbox";
+    box.textContent = "Tempel teks CV dulu di kolom 'CV mentah'."; return; }
+  btn.disabled = true; btn.textContent = "AI sedang ekstrak…";
+  try {
+    const res = await fetch("/profile/parse", {
+      method: "POST",
+      headers: {"Content-Type": "application/x-www-form-urlencoded"},
+      body: new URLSearchParams({cv_text: cv})
+    });
+    if (!res.ok) throw new Error(await res.text());
+    const d = await res.json();
+    const set = (k, v) => { const el = document.querySelector(`[name="${k}"]`); if (el && v) el.value = v; };
+    set("name", d.name); set("email", d.email); set("phone", d.phone);
+    set("target_role", d.target_role || d.headline);
+    set("headline", d.headline); set("summary", d.summary);
+    if (Array.isArray(d.skills)) document.querySelector("[name=skills]").value = d.skills.join(", ");
+    box.style.display = "block"; box.className = "hintbox";
+    box.textContent = "✅ Terekstrak. Periksa & sesuaikan sebelum disimpan.";
+  } catch (e) {
+    box.style.display = "block"; box.className = "errbox";
+    box.textContent = "Gagal: " + e.message;
+  } finally {
+    btn.disabled = false; btn.textContent = "✨ Ekstrak pakai AI";
+  }
+};
+</script>
+{% endblock %}

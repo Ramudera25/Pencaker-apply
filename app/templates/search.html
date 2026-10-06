@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="panel">
+  <h2>Cari Lowongan</h2>
+  <form method="post" action="/search">
+    <div class="grid2">
+      <div>
+        <label>Kata kunci / posisi</label>
+        <input name="keyword" required value="{{ q }}" placeholder="Contoh: Backend Engineer">
+      </div>
+      <div>
+        <label>Portal</label>
+        <select name="portal">
+          <option value="kalibrr"  {{ 'selected' if portal == 'kalibrr' }}>Kalibrr (gratis, stabil)</option>
+          <option value="glints"   {{ 'selected' if portal == 'glints' }}>Glints (API publik)</option>
+          <option value="jobstreet"{{ 'selected' if portal == 'jobstreet' }}>JobStreet (butuh browser)</option>
+          <option value="linkedin" {{ 'selected' if portal == 'linkedin' }}>LinkedIn (butuh browser)</option>
+        </select>
+      </div>
+    </div>
+    <button type="submit">Cari</button>
+  </form>
+
+  {% if errors %}
+  {% for e in errors %}
+  <div class="errbox">⚠️ {{ e.error }}</div>
+  {% endfor %}
+  {% endif %}
+
+  {% if results is not none %}
+  <p class="small muted" style="margin-top:14px">
+    {{ results|length }} lowongan ditemukan{% if saved is defined and saved %}, {{ saved }} disimpan ke antrian{% endif %}.
+  </p>
+  <form method="post" action="/api/apply/bulk" id="bulk-form">
+    <input type="hidden" name="profile_id" value="{{ profile_id if profile_id else '' }}">
+
+    {% if results %}
+    {% for j in results %}
+    <div class="job">
+      <div class="row">
+        <input type="checkbox" class="chk" name="job_ids" value="{{ j.id if j.id else '' }}" id="job-{{ loop.index }}">
+        <div style="flex:1">
+          <div class="t">{{ j.title }}</div>
+          <div class="c">{{ j.company }} · {{ j.location or '-' }} · {{ j.salary or 'gaji dirahasiakan' }}</div>
+          <div class="c"><a href="{{ j.url }}" target="_blank">{{ j.url }}</a></div>
+        </div>
+        <span class="pill queued">{{ j.portal }}</span>
+      </div>
+    </div>
+    {% endfor %}
+    <div class="row">
+      <button type="submit">Lamar yang dicentang (AI akan buat suratnya)</button>
+      <button type="button" class="ghost" onclick="document.querySelectorAll('[name=job_ids]').forEach(c=>c.checked=true)">
+        Centang semua
+      </button>
+    </div>
+    {% else %}
+    <p class="muted">Tidak ada hasil. Coba kata kunci lain atau portal lain.</p>
+    {% endif %}
+  </form>
+  {% endif %}
+</div>
+
+{% endblock %}

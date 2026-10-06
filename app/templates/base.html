@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AutoLamar — Lamar Kerja dibantu AI</title>
+  <style>
+    :root {
+      --bg: #0f1115; --panel: #171a21; --panel2: #1e222b; --line: #2a2f3a;
+      --text: #e7e9ee; --muted: #9aa3b2; --accent: #4f8cff; --accent2: #6ee7b7;
+      --warn: #fbbf24; --bad: #f87171; --ok: #34d399;
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--bg); color:var(--text);
+      font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+    header { padding:16px 20px; border-bottom:1px solid var(--line);
+      display:flex; gap:14px; align-items:center; flex-wrap:wrap; background:var(--panel); }
+    header h1 { font-size:18px; margin:0; }
+    header h1 span { color:var(--accent); }
+    nav { display:flex; gap:8px; flex-wrap:wrap; }
+    a { color:var(--accent); text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    main { max-width:1100px; margin:0 auto; padding:20px; display:grid; gap:20px; }
+    .panel { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:16px; }
+    .panel h2 { margin:0 0 12px; font-size:15px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; }
+    .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+    @media (max-width:820px){ .grid2{ grid-template-columns:1fr; } }
+    .cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:10px; }
+    .card { background:var(--panel2); border:1px solid var(--line); border-radius:8px; padding:12px; }
+    .card .num { font-size:24px; font-weight:700; }
+    .card .lbl { color:var(--muted); font-size:12px; text-transform:uppercase; }
+    input, textarea, select {
+      width:100%; background:var(--panel2); color:var(--text); border:1px solid var(--line);
+      border-radius:8px; padding:9px 10px; margin:4px 0 12px; font:inherit;
+    }
+    textarea { min-height:90px; resize:vertical; }
+    label { font-size:13px; color:var(--muted); }
+    button, .btn {
+      background:var(--accent); color:#fff; border:0; border-radius:8px; padding:9px 16px;
+      font:inherit; cursor:pointer; display:inline-block;
+    }
+    button:hover, .btn:hover { filter:brightness(1.1); }
+    button.ghost, .btn.ghost { background:var(--panel2); color:var(--text); border:1px solid var(--line); }
+    button.ghost:hover, .btn.ghost:hover { border-color:var(--accent); }
+    table { width:100%; border-collapse:collapse; font-size:14px; }
+    th, td { padding:8px 10px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }
+    th { color:var(--muted); font-weight:600; font-size:12px; text-transform:uppercase; }
+    .pill { display:inline-block; padding:2px 9px; border-radius:99px; font-size:12px; font-weight:600; }
+    .pill.queued { background:#334155; color:#cbd5e1; }
+    .pill.generating { background:#854d0e33; color:var(--warn); }
+    .pill.generated { background:#1d4ed833; color:#93c5fd; }
+    .pill.submitted { background:#065f4633; color:var(--ok); }
+    .pill.skipped { background:#52525233; color:var(--muted); }
+    .pill.failed { background:#991b1b33; color:var(--bad); }
+    .muted { color:var(--muted); }
+    .small { font-size:13px; }
+    .errbox { background:#991b1b22; border:1px solid #991b1b55; color:var(--bad);
+      border-radius:8px; padding:10px 12px; margin-top:10px; font-size:13px; }
+    .hintbox { background:#1e3a8a22; border:1px solid #1e3a8a55; color:#93c5fd;
+      border-radius:8px; padding:10px 12px; margin-top:10px; font-size:13px; }
+    .job { border:1px solid var(--line); border-radius:8px; padding:12px; margin-bottom:10px; background:var(--panel2); }
+    .job .t { font-weight:600; }
+    .job .c { color:var(--muted); font-size:13px; }
+    .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .spacer { flex:1; }
+    pre { background:#0b0d12; border:1px solid var(--line); border-radius:8px; padding:12px;
+      white-space:pre-wrap; word-wrap:break-word; font-size:13px; max-height:420px; overflow:auto; }
+    .chk { width:auto; margin-right:6px; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Auto<span>Lamar</span> 🚀</h1>
+  <nav>
+    <a class="btn ghost" href="/">Dashboard</a>
+    <a class="btn ghost" href="/profile/new">Profile</a>
+    <a class="btn ghost" href="/search">Cari Lowongan</a>
+  </nav>
+  <div class="spacer"></div>
+  <span class="small muted">AI: {{ llm_model if llm_model is defined else 'utama' }} via LiteLLM proxy</span>
+</header>
+<main>
+  {% block content %}{% endblock %}
+</main>
+</body>
+</html>
